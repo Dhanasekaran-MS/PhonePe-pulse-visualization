@@ -1,4 +1,4 @@
-# PhonePe-pulse-visualization
+# PhonePe pulse visualization on Streamlit DashBoard
 
 ## Table of Contents:
 1. About The Project
