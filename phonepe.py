@@ -569,20 +569,29 @@ elif option == 'Visualization':
                          color_discrete_sequence=px.colors.sequential.Turbo)
         st.plotly_chart(fig)
     st.markdown("#### PIE Chart")
-    col1, col2 = st.columns([3, 2])
+    col1, col2 = st.columns([3, 1])
     with col1:
-        option2 = st.selectbox('', options=[2018, 2019, 2020, 2021, 2022, 2023],
-                               label_visibility='collapsed', index=None, placeholder='Choose a Year'
+        state_pie = st.selectbox('', options=['Andaman & Nicobar Islands', 'Andhra Pradesh', 'Arunachal Pradesh',
+                             'Assam', 'Bihar', 'Chandigarh', 'Chhattisgarh', 'Dadra & Nagar Haveli & Daman & Diu',
+                             'Delhi', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jammu & Kashmir',
+                             'Jharkhand', 'Karnataka', 'Kerala', 'Ladakh', 'Lakshadweep', 'Madhya Pradesh',
+                             'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 
+                             'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
+                             'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal'],
+                             label_visibility='collapsed', index=None, placeholder='Choose a State'
                                )
-    if option2 is not None:
-        query = f'''select state, sum(Transaction_Count) as Transaction_count, 
-                    concat('₹ ',sum(Transaction_Amount)/10000000,' Cr') as Amount
-                    from aggrtrans where year = {option2} group by state order by Transaction_count desc limit 10;'''
+    with col2:
+        year_pie = st.selectbox('', options=[2018, 2019, 2020, 2021, 2022, 2023],
+                            label_visibility='collapsed', index=None, placeholder='Choose a Year')
+    if (state_pie is not None) and (year_pie is not None):
+        query = f'''select district,year,concat('₹',sum(transaction_amount)/10000000,' Cr') as Amount,
+                    sum(transaction_count) as Transaction_Count from maptrans where  state = '{state_pie}' and 
+                    year = {year_pie} group by district;'''
         df = pd.read_sql_query(query, mydb)
 
-        fig = px.pie(df, values='Transaction_count', names="state", labels='state', hover_name='Amount',
-                     title=f"Top 10 States based on Transaction count for the year : {option2}",
-                     color_discrete_sequence=px.colors.sequential.Turbo)
+        fig = px.pie(df, values='Transaction_Count', names="district", labels='district', hover_name='district',
+                     title=f"All Districts of {state_pie} based on Transaction count for the year : {year_pie}",
+                 color_discrete_sequence=px.colors.sequential.Turbo, hover_data=['Amount'])
         st.plotly_chart(fig)
 
     st.markdown('#### Animated chart ')
